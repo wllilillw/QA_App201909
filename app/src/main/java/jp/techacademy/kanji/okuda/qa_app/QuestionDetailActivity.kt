@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Button
 import android.widget.ListView
 
 import com.google.firebase.auth.FirebaseAuth
@@ -17,6 +18,9 @@ import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_question_detail.*
 
 import java.util.HashMap
+import android.R.attr.button
+import android.util.Log
+
 
 class QuestionDetailActivity : AppCompatActivity() {
 
@@ -78,6 +82,27 @@ class QuestionDetailActivity : AppCompatActivity() {
         listView.adapter = mAdapter
         mAdapter.notifyDataSetChanged()
 
+        val user = FirebaseAuth.getInstance().currentUser
+        // ボタンの定義
+        val btn: Button
+        btn = findViewById<View>(R.id.favButton) as Button
+        if (user == null) {
+            Log.d("aaa","user=null")
+            btn.setVisibility(View.INVISIBLE)
+
+        }else{
+            btn.setVisibility(View.VISIBLE)
+        }
+
+
+        favButton.setOnClickListener{
+            Log.d("aaa","oshita")
+            //mQuestionをfavoriteに追加
+
+        }
+
+
+
         fab.setOnClickListener {
             // ログイン済みのユーザーを取得する
             val user = FirebaseAuth.getInstance().currentUser
@@ -87,8 +112,11 @@ class QuestionDetailActivity : AppCompatActivity() {
                 val intent = Intent(applicationContext, LoginActivity::class.java)
                 startActivity(intent)
             } else {
-                // Questionを渡して回答作成画面を起動する
-                // TODO:
+                // --- ここから ---
+                val intent = Intent(applicationContext, AnswerSendActivity::class.java)
+                intent.putExtra("question", mQuestion)
+                startActivity(intent)
+                // --- ここまで ---
             }
         }
 

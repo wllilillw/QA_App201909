@@ -11,10 +11,19 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/listView"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/favButton"
+        android:layout_below="@id/listView"
+        android:text="お気に入り登録"
+        />
+
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

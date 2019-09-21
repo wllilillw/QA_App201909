@@ -19,4 +19,5 @@
         android:id="@+id/nameTextView"
         android:layout_below="@+id/bodyTextView"
         android:layout_alignParentEnd="true"/>
+
 </RelativeLayout>
