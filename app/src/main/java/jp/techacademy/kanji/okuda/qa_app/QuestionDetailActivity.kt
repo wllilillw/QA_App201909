@@ -83,6 +83,9 @@ class QuestionDetailActivity : AppCompatActivity() {
         mAdapter.notifyDataSetChanged()
 
         val user = FirebaseAuth.getInstance().currentUser
+        val dataBaseReference = FirebaseDatabase.getInstance().reference
+        val favorite = dataBaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.genre.toString()).child(mQuestion.questionUid)
+
         // ボタンの定義
         val btn: Button
         btn = findViewById<View>(R.id.favButton) as Button
@@ -98,6 +101,10 @@ class QuestionDetailActivity : AppCompatActivity() {
         favButton.setOnClickListener{
             Log.d("aaa","oshita")
             //mQuestionをfavoriteに追加
+            val data = HashMap<String,String>()
+            data ["favorite"]=mQuestion.questionUid
+            favorite.setValue(data)
+            favorite!!.addChildEventListener(mEventListener)
 
         }
 
@@ -120,7 +127,6 @@ class QuestionDetailActivity : AppCompatActivity() {
             }
         }
 
-        val dataBaseReference = FirebaseDatabase.getInstance().reference
         mAnswerRef = dataBaseReference.child(ContentsPATH).child(mQuestion.genre.toString()).child(mQuestion.questionUid).child(AnswersPATH)
         mAnswerRef.addChildEventListener(mEventListener)
     }
