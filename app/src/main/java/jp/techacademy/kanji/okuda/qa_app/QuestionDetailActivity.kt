@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_question_detail.*
 
 import java.util.HashMap
 import android.R.attr.button
+import android.provider.MediaStore
 import android.util.Log
 
 
@@ -30,6 +31,7 @@ class QuestionDetailActivity : AppCompatActivity() {
 
     private val mEventListener = object : ChildEventListener {
         override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
+            val a=0
             val map = dataSnapshot.value as Map<String, String>
 
             val answerUid = dataSnapshot.key ?: ""
@@ -50,6 +52,8 @@ class QuestionDetailActivity : AppCompatActivity() {
             mAdapter.notifyDataSetChanged()
         }
 
+
+
         override fun onChildChanged(dataSnapshot: DataSnapshot, s: String?) {
 
         }
@@ -66,6 +70,49 @@ class QuestionDetailActivity : AppCompatActivity() {
 
         }
     }
+
+
+
+
+    private val mEventListener2 = object : ChildEventListener {
+        override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
+            var flag1 = 0
+         //  val map = dataSnapshot.value as Map<String, String>
+
+            val favoriteUid = dataSnapshot.key ?: ""
+
+            for (favorite in mQuestion.questionUid) {
+                // 同じAnswerUidのものが存在しているときは何もしない
+                if (favoriteUid == mQuestion.questionUid) {
+                    favButton.text = "お気に入り登録"
+                    flag1= 1
+                }else{
+                    favButton.text = "お気に入り解除"
+                    flag1 = 2
+                }
+            }
+
+        }
+
+
+
+        override fun onChildChanged(dataSnapshot: DataSnapshot, s: String?) {
+
+        }
+
+        override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+
+        }
+
+        override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {
+
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,8 +131,8 @@ class QuestionDetailActivity : AppCompatActivity() {
 
         val user = FirebaseAuth.getInstance().currentUser
         val dataBaseReference = FirebaseDatabase.getInstance().reference
-        val favorite = dataBaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.genre.toString()).child(mQuestion.questionUid)
-
+        val favorite = dataBaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
+        favorite.addChildEventListener(mEventListener2)
         // ボタンの定義
         val btn: Button
         btn = findViewById<View>(R.id.favButton) as Button
@@ -95,16 +142,27 @@ class QuestionDetailActivity : AppCompatActivity() {
 
         }else{
             btn.setVisibility(View.VISIBLE)
-        }
 
+        }
 
         favButton.setOnClickListener{
             Log.d("aaa","oshita")
             //mQuestionをfavoriteに追加
             val data = HashMap<String,String>()
-            data ["favorite"]=mQuestion.questionUid
-            favorite.setValue(data)
-            favorite!!.addChildEventListener(mEventListener)
+
+
+            if (favButton.text.toString() == "お気に入り登録") {
+                data["favorite"] = mQuestion.questionUid
+                data["genre"] = mQuestion.genre.toString()
+                favorite.setValue(data)
+                //favorite!!.addChildEventListener(mEventListener)
+            }else{
+                favorite.removeValue()
+                favButton.text = "お気に入り登録"
+                //お気に入りに入っていればtextchange
+            }
+
+
 
         }
 
@@ -127,7 +185,9 @@ class QuestionDetailActivity : AppCompatActivity() {
             }
         }
 
-        mAnswerRef = dataBaseReference.child(ContentsPATH).child(mQuestion.genre.toString()).child(mQuestion.questionUid).child(AnswersPATH)
+        //mGenreRef = mDatabaseReference.child(ContentsPATH).child(mGenre.toString())
+        mAnswerRef = dataBaseReference.child(FavoritePATH).child(mQuestion.questionUid)
+        //mAnswerRef = dataBaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
         mAnswerRef.addChildEventListener(mEventListener)
     }
 }
